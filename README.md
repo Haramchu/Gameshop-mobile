@@ -6,6 +6,8 @@ Kelas       : PBP C
 
 [Tugas 7](#tugas-7)
 
+[Tugas 8](#tugas-8)
+
 # Tugas 7
 ## Membuat sebuah program Flutter baru
 1. Instalasi flutter di [windows](https://docs.flutter.dev/get-started/install/windows).
@@ -202,3 +204,13 @@ Source:[geeksforgeeks](https://www.geeksforgeeks.org/flutter-stateful-vs-statele
 *ShopCard*: widget StatelessWidget yang mewakili *Shopitem card*. Ini menampilkan ikon, teks, dan warna yang terkait dengan item yang diberikan.
 
 Widget lain yang digunakan, seperti *Scaffold, AppBar, SingleChildScrollView, Padding, Column, GridView.count, InkWell, Container, Center, Icon, Text, dan SnackBar*, adalah bagian dari Flutter SDK dan digunakan untuk mengatur tata letak dan menampilkan elemen UI yang berbeda di aplikasi.
+
+# Tugas 7
+## Perbedaan `Navigator.push()` dan `Navigator.pushReplacement()`
+## *Layout* widget pada Flutter dan penggunaannya
+## Element input dalam form
+## *Clean architecture*
+## Membuat halaman tambah item
+## Mengarahkan pengguna ke halaman tambah item
+## Memunculkan data sesuai dengan formulir yang diisi dalam sebuah `pop-up` setelah menekan `save` pada halaman tambah item
+## Membuat drawer pada aplikasi
