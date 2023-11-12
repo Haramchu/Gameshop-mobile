@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gameshop/screens/menu.dart';
+import 'package:provider/provider.dart';
+import 'package:gameshop/item_model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ItemModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

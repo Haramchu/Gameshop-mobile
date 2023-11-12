@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gameshop/widgets/left_drawer.dart';
+import 'package:gameshop/item_model.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,14 +19,6 @@ class MyApp extends StatelessWidget {
       home: const ShopFormPage(),
     );
   }
-}
-
-class Item {
-  final String name;
-  final int price;
-  final String description;
-
-  Item({required this.name, required this.price, required this.description});
 }
 
 class ShopFormPage extends StatefulWidget {
@@ -38,7 +33,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
   String _name = "";
   int _price = 0;
   String _description = "";
-  List<Item> itemList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +46,6 @@ class _ShopFormPageState extends State<ShopFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -146,7 +139,10 @@ class _ShopFormPageState extends State<ShopFormPage> {
                           price: _price,
                           description: _description,
                         );
-                        itemList.add(newItem);
+
+                        // Use Provider to access the ItemModel and add the new item
+                        Provider.of<ItemModel>(context, listen: false)
+                            .addItem(newItem);
 
                         showDialog(
                           context: context,
@@ -184,62 +180,9 @@ class _ShopFormPageState extends State<ShopFormPage> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ItemListPage(items: itemList),
-                        ),
-                      );
-                    },
-                    child: const Text("View Items"),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ItemListPage extends StatelessWidget {
-  final List<Item> items;
-
-  const ItemListPage({required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('List of Items'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-      ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(items[index].name),
-            subtitle: Text('Price: ${items[index].price}'),
-            onTap: () {
-              // You can add any additional functionality here when an item is tapped
-              // For example, navigate to a detailed view of the item
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => ItemDetailPage(item: items[index]),
-              //   ),
-              // );
-            },
-          );
-        },
       ),
     );
   }

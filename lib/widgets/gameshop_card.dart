@@ -1,5 +1,5 @@
+// gameshop_card.dart
 import 'package:flutter/material.dart';
-import 'package:gameshop/screens/gameshop_form.dart';
 
 class ShopItem {
   final String name;
@@ -11,28 +11,17 @@ class ShopItem {
 
 class ShopCard extends StatelessWidget {
   final ShopItem item;
+  final VoidCallback? onCardTap; // Add this line
 
-  const ShopCard(this.item, {super.key}); // Constructor
+  const ShopCard(this.item, {Key? key, this.onCardTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: item.color,
       child: InkWell(
-        // Area responsive terhadap sentuhan
-        onTap: () {
-          // Memunculkan SnackBar ketika diklik
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!")));
-          if (item.name == "Tambah Item") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ShopFormPage()));
-          }
-        },
+        onTap: onCardTap, // Use the provided onCardTap callback
         child: Container(
-          // Container untuk menyimpan Icon dan Text
           padding: const EdgeInsets.all(8),
           child: Center(
             child: Column(

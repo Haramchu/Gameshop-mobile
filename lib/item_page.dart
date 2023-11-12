@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:gameshop/item_model.dart';
 import 'package:gameshop/widgets/left_drawer.dart';
+import 'package:provider/provider.dart';
 
 class ItemPage extends StatelessWidget {
-  final List<Item>
-      items; // Assuming Item is a class to represent each entered item
-
-  const ItemPage({required this.items});
+  const ItemPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    List<Item> items = Provider.of<ItemModel>(context).items;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'List Item',
-          ),
+        title: const Text(
+          'Game Shop',
         ),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
@@ -25,28 +24,19 @@ class ItemPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(items[index].name),
-            subtitle: Text('Price: ${items[index].price}'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Price: ${items[index].price}'),
+                Text('Description: ${items[index].description}'),
+              ],
+            ),
             onTap: () {
               // You can add any additional functionality here when an item is tapped
-              // For example, navigate to a detailed view of the item
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => ItemDetailPage(item: items[index]),
-              //   ),
-              // );
             },
           );
         },
       ),
     );
   }
-}
-
-class Item {
-  final String name;
-  final int price;
-  final String description;
-
-  Item({required this.name, required this.price, required this.description});
 }
