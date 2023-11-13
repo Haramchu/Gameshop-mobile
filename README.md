@@ -494,9 +494,349 @@ Lapisan ini dapat diakses oleh semua lapisan lainnya. *Resources* berisi aset (g
 
 Source : [An Introduction to Flutter Clean Architecture](https://medium.com/ruangguru/an-introduction-to-flutter-clean-architecture-ae00154001b0)
 
-## Membuat halaman tambah item
+## Membuat halaman tambah item dan memunculkan `pop-up` serta menyimpan data dari pengguna pada objek model.
+1. Buat berkas baru pada direktori `lib` dengan nama `gameshop_form.dart` dan menambahkan kode berikut ke dalam file tersebut.
+```dart
+import 'package:flutter/material.dart';
+import 'package:gameshop/widgets/left_drawer.dart';
 
-## Mengarahkan pengguna ke halaman tambah item
+class ShopFormPage extends StatefulWidget {
+    const ShopFormPage({super.key});
 
-## Memunculkan data sesuai dengan formulir yang diisi dalam sebuah `pop-up` setelah menekan `save` pada halaman tambah item
+    @override
+    State<ShopFormPage> createState() => _ShopFormPageState();
+}
+
+class _ShopFormPageState extends State<ShopFormPage> {
+    @override
+    Widget build(BuildContext context) {
+        return Placeholder();
+    }
+}
+```
+2. Bagian `Placeholder` diubah dengan kode berikut yang berfungsi untuk menambahkan form dengan beberapa *input field*
+```dart
+Scaffold(
+  appBar: AppBar(
+    title: const Center(
+      child: Text(
+        'Form Tambah Item',
+      ),
+    ),
+    backgroundColor: Colors.indigo,
+    foregroundColor: Colors.white,
+  ),
+  drawer: const LeftDrawer(),
+  body: Form()
+)
+```
+3. Buat variabel baru berisi `_formkey` dan tambahkan ke dalam atribut `key` milik widget `Form`. Atribut `key` akan berfungsi sebagai handler dari form state, validasi form, dan penyimpanan form.
+```dart
+class _ShopFormPageState extends State<ShopFormPage> {
+  final _formKey = GlobalKey<FormState>();
+```
+```dart
+...
+body: Form(
+  key: _formKey,
+  child: SingleChildScrollView(),
+),
+...
+```
+4. Mengisi widget `Form` dengan *field* seperti berikut:
+```dart
+class _ShopFormPageState extends State<ShopFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  String _name = "";
+  int _price = 0;
+  String _description = "";
+```
+5. Membuat widget `TextFormField` yang dibungkus oleh `Padding` sebagai salah satu *children* dari widget `Column`. Setelah itu, tambahkan atribut `crossAxisAlignment` untuk mengatur *alignment* *children* dari `Column`.
+```dart
+...
+child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              hintText: "Nama Produk",
+              labelText: "Nama Produk",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+            ),
+            onChanged: (String? value) {
+              setState(() {
+                _name = value!;
+              });
+            },
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return "Nama tidak boleh kosong!";
+              }
+              return null;
+            },
+          ),
+        ),
+...
+```
+6. Membuat dua `TextFormField` yang dibungkus dengan `Padding` sebagai child selanjutnya dari `Column` seperti sebelumnya untuk *field* `price` dan `description`.
+```dart
+Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: TextFormField(
+    decoration: InputDecoration(
+      hintText: "Nama Item",
+      labelText: "Nama Item",
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    ),
+    onChanged: (String? value) {
+      setState(() {
+        _name = value!;
+      });
+    },
+    validator: (String? value) {
+      if (value == null || value.isEmpty) {
+        return "Nama tidak boleh kosong!";
+      }
+      return null;
+    },
+  ),
+),
+Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: TextFormField(
+    decoration: InputDecoration(
+      hintText: "Harga",
+      labelText: "Harga",
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    ),
+    onChanged: (String? value) {
+      setState(() {
+        _price = int.parse(value!);
+      });
+    },
+    validator: (String? value) {
+      if (value == null || value.isEmpty) {
+        return "Harga tidak boleh kosong!";
+      }
+      if (int.tryParse(value) == null) {
+        return "Harga harus berupa angka!";
+      }
+      return null;
+    },
+  ),
+),
+Padding(
+  padding: const EdgeInsets.all(8.0),
+  child: TextFormField(
+    decoration: InputDecoration(
+      hintText: "Deskripsi",
+      labelText: "Deskripsi",
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+    ),
+    onChanged: (String? value) {
+      setState(() {
+        _description = value!;
+      });
+    },
+    validator: (String? value) {
+      if (value == null || value.isEmpty) {
+        return "Deskripsi tidak boleh kosong!";
+      }
+      return null;
+    },
+  ),
+),
+```
+Kode tersebut akan memvalidasi input dan menerima input dari pengguna.
+7. Buatl tombol `Save` sebagai *child* selanjutnya dari `Column`. Bungkus tombol ke dalam widget Padding dan Align. Setelah itu, data akan digunakan dan disimpan agar dapat ditampilkan dalam *page* `Lihat Item`. Sebuah *pop-up* juga akan muncul setelah *input* dari pengguna berhasil masuk validasi.
+```dart
+Align(
+  alignment: Alignment.bottomCenter,
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.indigo),
+      ),
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          Item newItem = Item(
+            name: _name,
+            price: _price,
+            description: _description,
+          );
+
+          // Use Provider to access the ItemModel and add the new item
+          Provider.of<ItemModel>(context, listen: false)
+              .addItem(newItem);
+
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Item berhasil tersimpan'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Nama: $_name'),
+                      Text('Price: $_price'),
+                      Text('Description: $_description')
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        _formKey.currentState!.reset();
+      },
+      child: const Text(
+        "Save",
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ),
+),
+```
+`Provider` digunakan untuk menyimpan data
+
+## Mengarahkan pengguna ke halaman tambah *item* dan lihat *item*.
+Di dalam file `menu.dart` sesuaikan *page* yang akan dimasukkan ke dalam *route stack* saat tombol tambah *item* atau liha *item* ditekan.
+```dart
+if (item.name == "Tambah Item") {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const ShopFormPage(),
+    ),
+  );
+} else if (item.name == "Lihat Item") {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) =>
+          const ItemPage(), // Use 'items' instead of 'item'
+    ),
+  );
+}
+```
+
 ## Membuat drawer pada aplikasi
+1. Buat file baru bernama `left_drawer.dart` dan tambhkan kode berikut.
+```dart
+import 'package:flutter/material.dart';
+import 'package:gameshop/screens/menu.dart';
+import 'package:gameshop/screens/gameshop_form.dart';
+import 'package:gameshop/item_page.dart';
+
+class LeftDrawer extends StatelessWidget {
+  const LeftDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          const DrawerHeader(
+            // TODO: Bagian drawer header
+          ),
+          // TODO: Bagian routing
+        ],
+      ),
+    );
+  }
+}
+```
+2. *Routing* halaman yang sesuai dengan di dalam *drawer*.
+```dart
+ListTile(
+  leading: const Icon(Icons.home_outlined),
+  title: const Text('Halaman Utama'),
+  onTap: () {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyHomePage(),
+      ),
+    );
+  },
+),
+ListTile(
+  leading: const Icon(Icons.add_shopping_cart),
+  title: const Text('Lihat Item'),
+  onTap: () {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ItemPage(),
+      ),
+    );
+  },
+),
+ListTile(
+  leading: const Icon(Icons.add_shopping_cart),
+  title: const Text('Tambah Item'),
+  onTap: () {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ShopFormPage(),
+      ),
+    );
+  },
+),
+```
+3. Menghias *drawer* dengan sesuai dengan kebutuhan.
+```dart
+const DrawerHeader(
+  decoration: BoxDecoration(
+    color: Colors.indigo,
+  ),
+  child: Column(
+    children: [
+      Text(
+        'Game Shop',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      Padding(padding: EdgeInsets.all(10)),
+      Text(
+        "Catat seluruh keperluan belanjamu di sini!",
+        style: TextStyle(
+          fontSize: 15,
+          color: Colors.white,
+          fontWeight: FontWeight.normal,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ],
+  ),
+),
+```
+4. Menambahkan kode berikut untuk menampilkan *drawer* di *page* yang diinginkan.
+```dart
+drawer: const LeftDrawer(),
+```

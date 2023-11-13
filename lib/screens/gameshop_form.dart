@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gameshop/item_model.dart';
 import 'package:provider/provider.dart';
+import 'package:gameshop/widgets/left_drawer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,6 +47,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
