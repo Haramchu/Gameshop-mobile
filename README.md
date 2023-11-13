@@ -207,10 +207,296 @@ Widget lain yang digunakan, seperti *Scaffold, AppBar, SingleChildScrollView, Pa
 
 # Tugas 7
 ## Perbedaan `Navigator.push()` dan `Navigator.pushReplacement()`
+### `Navigator.push()`
+`Navigator.push()` menambahkan *suatu route* ke dalam *stack route* yang dikelola oleh `Navigator`. Method ini menyebabkan *route* yang ditambahkan berada pada paling atas *stack*, sehingga *route* yang baru saja ditambahkan tersebut akan muncul dan ditampilkan kepada pengguna.
+Contoh penggunaan:
+```dart
+if (item.name == "Tambah Item") {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const ShopFormPage(),
+    ),
+  );
+}
+```
+`Navigator.push()` digunakan di dalam `MyHomePage()` di `menu.dart` tersebut untuk pindah ke dalam halaman `ShopFormPage()` dan saat pengguna sudah selesai, mereka akan secara automatis kembali ke halaman `MyHomePage()` di `menu.dart`
+### `Navigator.pushReplacement()`
+`Navigator.pushReplacement()` menghapus *route* yang sedang ditampilkan kepada pengguna dan menggantinya dengan suatu *route*. Method ini menyebabkan aplikasi untuk berpindah dari *route* yang sedang ditampilkan kepada pengguna ke suatu *route* yang diberikan. Pada *stack route* yang dikelola `Navigator`, *route* lama pada atas *stack* akan digantikan secara langsung oleh *route* baru yang diberikan tanpa mengubah kondisi elemen *stack* yang berada di bawahnya.
+Contoh penggunaan:
+```dart
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (context) => MyHomePage(),
+  ),
+);
+```
+`Navigator.pushReplacement()` digunakan untuk *replace stack route* yang ada di paling atas dengan halaman `MyHomePage()`. Hal ini dilakukan agar pengguna tidak kembali ke halaman lain atau sebelumnya setelah selesai dari halaman `MyHomePage()`.
+
+Perbedaan utama kedua method tersebut terletak pada apa yang dilakukan kepada *route* yang berada pada atas *stack*. `Navigator.push()` akan menambahkan *route* baru diatas *route* yang sudah ada pada atas *stack*, sedangkan `Navigator.pushReplacement()` menggantikan *route* yang sudah ada pada atas *stack* dengan *route* baru tersebut. 
+
 ## *Layout* widget pada Flutter dan penggunaannya
+### *Container*
+*Container* adalah widget yang digunakan untuk mengatur tata letak dan mengatur *style* elemen lainnya. Ini dapat digunakan untuk menentukan batas, padding, warna latar, dan sebagainya.
+Contoh penggunaan:
+```dart
+Container(
+  margin: EdgeInsets.all(16.0),
+  padding: EdgeInsets.all(8.0),
+  decoration: BoxDecoration(
+    color: Colors.blue,
+    borderRadius: BorderRadius.circular(8.0),
+  ),
+  child: Text('Hello, Flutter!'),
+)
+```
+### *Row* dan *Column*
+Digunakan untuk mengatur elemen-elemen secara horizontal (*Row*) atau vertikal (*Column*). Berguna ketika ingin menyusun atau mengatur letak widget.
+Contoh penggunaan:
+```dart
+Row(
+  children: [
+    Icon(Icons.star),
+    Text('5.0'),
+  ],
+)
+Column(
+  children: [
+    Text('Title'),
+    Text('Subtitle'),
+  ],
+)
+```
+### *Listview*
+*Listview* digunakan untuk membuat daftar *scrollable list* dari widget yang dapat di-*scroll*. Berguna ketika ingin menampilkan data dalam jumlah besar.
+Contoh penggunaan:
+```dart
+ListView(
+  children: [
+    ListTile(
+      title: Text('Item 1'),
+    ),
+    ListTile(
+      title: Text('Item 2'),
+    ),
+  ],
+)
+```
+### *Expanded* dan *Flexible*
+Kedua widget tersebut digunakan untuk memberikan widget keleluasaan dalam mengisi ruang tersedia. Digunakan dalam *Row, Column,* atau *Flex*.
+Contoh penggunaan:
+```dart
+Column(
+  children: [
+    Text('Fixed Height'),
+    Expanded(
+      child: Container(
+        color: Colors.blue,
+      ),
+    ),
+    Text('Fixed Height'),
+  ],
+)
+```
+### *Stack*
+*Stack* digunakan untuk menumpuk widget di atas satu sama lain. Berfungsi saat ingin menempatkan beberapa widget di lokasi yang sama.
+Contoh penggunaan:
+```dart
+Stack(
+  children: [
+    Positioned(
+      top: 10.0,
+      left: 10.0,
+      child: Text('Top Left'),
+    ),
+    Positioned(
+      bottom: 10.0,
+      right: 10.0,
+      child: Text('Bottom Right'),
+    ),
+  ],
+)
+```
+### *Gridview*
+*Gridview* digunakan untuk menampilkan widget dalam susunan kolom dan baris. Berguna untuk menampilkan data dalam bentuk *grid*.
+Contoh penggunaan:
+```dart
+GridView.count(
+  primary: true,
+  padding: const EdgeInsets.all(20),
+  crossAxisSpacing: 10,
+  mainAxisSpacing: 10,
+  crossAxisCount: 3,
+  shrinkWrap: true,
+),
+```
+### *SizedBox*
+*SizedBox* digunakan untuk memberikan dimensi tetap pada suatu widget atau untuk membuat ruang kosong.
+```dart
+SizedBox(
+  width: 100.0,
+  height: 50.0,
+  child: RaisedButton(
+    onPressed: () {},
+    child: Text('Button'),
+  ),
+)
+```
+Untuk *layout-layout* lainnya, dapat dilihat dalam link berikut [Flutter Layout Widgets](https://docs.flutter.dev/ui/widgets/layout?gclid=EAIaIQobChMIlOX0sea-ggMViatmAh1iIwnyEAAYASAAEgLTIfD_BwE&gclsrc=aw.ds)
+
 ## Element input dalam form
+Dalam file `gameshop_form.dart`, terdapat beberapa elemen input pada *form* yang digunakan untuk memasukkan informasi *item*. Berikut adalah elemen-elemen input pada *form*:
+```dart
+TextFormField(
+  decoration: InputDecoration(
+    hintText: "Nama Item",
+    labelText: "Nama Item",
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+  ),
+  onChanged: (String? value) {
+    setState(() {
+      _name = value!;
+    });
+  },
+  validator: (String? value) {
+    if (value == null || value.isEmpty) {
+      return "Nama tidak boleh kosong!";
+    }
+    return null;
+  },
+)
+TextFormField(
+  decoration: InputDecoration(
+    hintText: "Harga",
+    labelText: "Harga",
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+  ),
+  onChanged: (String? value) {
+    setState(() {
+      _price = int.parse(value!);
+    });
+  },
+  validator: (String? value) {
+    if (value == null || value.isEmpty) {
+      return "Harga tidak boleh kosong!";
+    }
+    if (int.tryParse(value) == null) {
+      return "Harga harus berupa angka!";
+    }
+    return null;
+  },
+)
+TextFormField(
+  decoration: InputDecoration(
+    hintText: "Deskripsi",
+    labelText: "Deskripsi",
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+  ),
+  onChanged: (String? value) {
+    setState(() {
+      _description = value!;
+    });
+  },
+  validator: (String? value) {
+    if (value == null || value.isEmpty) {
+      return "Deskripsi tidak boleh kosong!";
+    }
+    return null;
+  },
+)
+
+```
+`TextFormField` memberikan area *input* teks yang dapat diisi dengan dukungan validasi (*validator*) untuk memastikan bahwa *input* tidak boleh kosong.
+
+Ada juga `ElevatedButton` yang digunakan untuk menyimpan item setelah selesai divalidasi.
+```dart
+ElevatedButton(
+  style: ButtonStyle(
+    backgroundColor: MaterialStateProperty.all(Colors.indigo),
+  ),
+  onPressed: () {
+    if (_formKey.currentState!.validate()) {
+      Item newItem = Item(
+        name: _name,
+        price: _price,
+        description: _description,
+      );
+
+      // Use Provider to access the ItemModel and add the new item
+      Provider.of<ItemModel>(context, listen: false)
+          .addItem(newItem);
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Item berhasil tersimpan'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nama: $_name'),
+                  Text('Price: $_price'),
+                  Text('Description: $_description')
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    _formKey.currentState!.reset();
+  },
+  child: const Text(
+    "Save",
+    style: TextStyle(color: Colors.white),
+  ),
+),
+```
 ## *Clean architecture*
+*Clean Architecture* adalah suatu arsitektur perangkat lunak yang menekankan pemisahan konsep dan tanggung jawab di dalam aplikasi. *Clean Architecture* membagi kode ke dalam beberapa lapisan (*layers*) untuk memastikan bahwa kode bersih, terorganisir, dan dapat diuji dengan baik.
+**Penerapan *Clean architecture* pada aplikasi Flutter:**
+*Clean Architecture* adalah pendekatan desain perangkat lunak yang menekankan pemisahan konsep dan tanggung jawab dalam sebuah aplikasi. Pada *Clean Architecture*, ada prinsip yang dikenal sebagai "*Dependency Rule*" yang menyatakan bahwa ketergantungan arah harus mengarah ke dalam. Ini berarti modul internal tidak tahu atau tidak bergantung pada modul eksternal, sementara modul eksternal tahu dan bergantung pada modul internal.
+
+Dalam implementasi *Clean Architecture* pada Flutter, struktur proyek biasanya dibagi menjadi beberapa lapisan:
+
+1. *Feature Layer:*
+Ini adalah lapisan presentasi aplikasi yang paling tergantung pada *framework* (Flutter). Di sini terdapat widget untuk menampilkan UI, *state management* (contoh: BLoCs, Provider, GetX), dan halaman-halaman aplikasi.
+Contoh struktur proyek di dalam *feature/user* mencakup halaman (*page*), controller, dan widget.
+
+2. *Domain Layer:*
+Ini adalah lapisan terdalam yang tidak memiliki ketergantungan dengan lapisan lainnya. Berisi *business rule* aplikasi tanpa bergantung pada detail implementasi.
+Contoh struktur proyek di dalam *domain/user* mencakup *entity*, *use cases*, dan repository.
+
+3. *Data Layer:*
+Mewakili lapisan data aplikasi. Terdapat implementasi *repository* (repository_impl), *DTO models* (dto), *data sources*, dan *mapper* untuk konversi antara *entitas* dan *model DTO*.
+Contoh struktur proyek di dalam *data/user* mencakup *DTO models*, *data sources*, dan *repository*.
+
+4. *Resources and Shared Library:*
+Lapisan ini dapat diakses oleh semua lapisan lainnya. *Resources* berisi aset (gambar, font, warna, dll.), sedangkan *Shared Library* berisi komponen dan fungsionalitas yang dapat digunakan.
+
+*Clean Architecture* membantu memisahkan konsep dan tanggung jawab. *Business rule* berada di lapisan domain, implementasi repositori di lapisan data, dan presentasi di lapisan feature. *Clean Architecture* membuat aplikasi lebih mudah dikembangkan dan rapih.
+
+Source : [An Introduction to Flutter Clean Architecture](https://medium.com/ruangguru/an-introduction-to-flutter-clean-architecture-ae00154001b0)
+
 ## Membuat halaman tambah item
+
 ## Mengarahkan pengguna ke halaman tambah item
+
 ## Memunculkan data sesuai dengan formulir yang diisi dalam sebuah `pop-up` setelah menekan `save` pada halaman tambah item
 ## Membuat drawer pada aplikasi
