@@ -40,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
@@ -107,6 +109,12 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: const Text('Login'),
             ),
+            SizedBox(height: 20),
+            Text(
+              'Don`t have an account yet?',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Navigate to registration page

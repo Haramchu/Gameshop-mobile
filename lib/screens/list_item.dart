@@ -41,6 +41,8 @@ class _ProductPageState extends State<ProductPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Product'),
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
         ),
         drawer: LeftDrawer(id: id),
         body: FutureBuilder(

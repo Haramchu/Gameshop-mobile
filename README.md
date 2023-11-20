@@ -863,7 +863,7 @@ Merupakan objek yang berkaitan dengan permintaan HTTP yang menyimpan informasi *
 
 ## Mekanisme pengambilan data dari JSON dan penampilan data di flutter
 1. Melakukan permintaan HTTP ke endpoint yang menyediakan data dalam format JSON. Hal ini dapat dilakukan dengan menggunakan file baru di /lib/models/<NAMA-MODEL>.dart dan isi sesuai dengan format json yang akan diterima melalui konversi di [Quicktype](https://app.quicktype.io)
-2. Melakukan parsing (deserialization) respons JSON ke dalam struktur data yang dapat digunakan dalam aplikasi Flutter, seperti kode berikut yang didapatkan dari hasil konversi di Quicktype:
+2. Melakukan parsing (deserialization) respons JSON ke dalam struktur data yang dapat digunakan dalam aplikasi Flutter, seperti kode berikut yang didapatkan dari hasil konversi di [Quicktype](https://app.quicktype.io):
 ```dart
 class Item {
   String model;
@@ -1039,7 +1039,558 @@ Bertanggung jawab untuk menavigasi antar halaman dalam aplikasi.
 dan lainnya.
 
 ## Membuat halaman login pada aplikasi Flutter
+1. Instalasi *package* yang sesuai untuk autentikasi *user* melalui perintah berikut:
+```shell
+flutter pub add provider
+flutter pub add pbp_django_auth
+```
+2. Memodifikasi `main.dart` agar bisa menyediakan `CookieRequest` *library* ke semua *child widgets* dengan menggunakan `Provider` melalui pengubahan kelas `MyApp`.
+```dart
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+          title: 'Flutter App',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+            useMaterial3: true,
+          ),
+          home: const LoginPage()),
+    );
+  }
+}
+```
+Jangan lupa untuk mengubah bagian `home:` ke halaman login yang akan dibuat.
+3. Buat *file* baru dengan nama `login.dart` di *folder* `screens` dengan isi seperti berikut:
+```dart
+import 'package:gameshop/screens/menu.dart';
+import 'package:gameshop/screens/register.dart';
+import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(const LoginApp());
+}
+
+class LoginApp extends StatelessWidget {
+  const LoginApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+              ),
+            ),
+            const SizedBox(height: 12.0),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 24.0),
+            ElevatedButton(
+              onPressed: () async {
+                String username = _usernameController.text;
+                String password = _passwordController.text;
+
+                // Cek kredensial
+                // Untuk menyambungkan Android emulator dengan Django pada localhost,
+                // gunakan URL http://10.0.2.2/
+                final response =
+                    await request.login("http://localhost:8000/auth/login/", {
+                  'username': username,
+                  'password': password,
+                });
+
+                if (request.loggedIn) {
+                  String message = response['message'];
+                  String uname = response['username'];
+                  int id = response['id'];
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyHomePage(id: id)),
+                  );
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(
+                        content: Text("$message Selamat datang, $uname.")));
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Login Gagal'),
+                      content: Text(response['message']),
+                      actions: [
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+              child: const Text('Login'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Don`t have an account yet?',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to registration page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const RegistrationPage()),
+                );
+              },
+              child: const Text('Register'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+Ada tambahan `register` dan `id` untuk *parameter passing*. Sesuikan `url` dengan tempat menjalankan proyek Django atau `url` yang sudah di-*deploy*
+5. Jalankan aplikasi Flutter dan proyek DJango apabila menggunakan `localhost` untuk mengecek apakah aplikasi dapat login atau tidak.
+
 ## Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter
+1. Buat sebuah `django-app` baru dengan nama `authentication` pada proyek Django sebelumnya.
+2. Tambahkan `authentication` ke `INSTALLED_APPS` pada *main project* `settings.py` aplikasi Django.
+3. Jalankan perintah `pip install django-cors-headers` untuk menginstal *library* yang dibutuhkan.
+4. Tambahkan `corsheaders` ke `INSTALLED_APPS` pada *main project* `settings.py` aplikasi Django.
+5. Tambahkan `corsheaders.middleware.CorsMiddleware` pada *main project* `settings.py` aplikasi Django.
+6. Tambahkan beberapa variabel berikut ini pada *main project* `settings.py` aplikasi Django.
+```python
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+```
+7. Tambahkan `django-cors-headers` di requirements.txt 
+8. Buat sebuah fungsi baru untuk login di `authentication/views.py`.
+```python
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def login(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            auth_login(request, user)
+            # Status login sukses.
+            return JsonResponse({
+                "username": user.username,
+                "status": True,
+                "message": "Login sukses!"
+                # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
+            }, status=200)
+        else:
+            return JsonResponse({
+                "status": False,
+                "message": "Login gagal, akun dinonaktifkan."
+            }, status=401)
+
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "Login gagal, periksa kembali email atau kata sandi."
+        }, status=401)
+```
+9. Buat *file* `urls.py` pada *folder* `authentication` dan tambahkan URL *routing* pada fungsi yang baru dibuat.
+```python
+from django.urls import path
+from authentication.views import login
+
+app_name = 'authentication'
+
+urlpatterns = [
+    path('login/', login, name='login'),
+]
+```
+10. Tambahkan `path('auth/', include('authentication.urls')),` pada file `main/urls.py`.
+
 ## Membuat model kustom sesuai dengan proyek Django
+1. Buka *endpoint* JSON yang sudah dibuat sebelumnya dan salin data tersebut ke dalam [Quicktype](https://app.quicktype.io). Sesuaikan parameter di dalam [Quicktype](https://app.quicktype.io) dengan kebutuhan (*setup name*, *source type*, dan *language*)
+2. Salin hasil konversi dari [Quicktype](https://app.quicktype.io) ke dalam *file* baru bernama `item.dart` di *folder* baru di dalam `lib` (`lib/models/item.dart`). Hasil konversi dapat dilihat sebagai berikut.
+```dart
+class Item {
+  String model;
+  int pk;
+  Fields fields;
+
+  Item({
+    required this.model,
+    required this.pk,
+    required this.fields,
+  });
+
+  factory Item.fromJson(Map<String, dynamic> json) => Item(
+        model: json["model"],
+        pk: json["pk"],
+        fields: Fields.fromJson(json["fields"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "model": model,
+        "pk": pk,
+        "fields": fields.toJson(),
+      };
+}
+
+class Fields {
+  int user;
+  String name;
+  DateTime dateAdded;
+  int amount;
+  int price;
+  String description;
+
+  Fields({
+    required this.user,
+    required this.name,
+    required this.dateAdded,
+    required this.amount,
+    required this.price,
+    required this.description,
+  });
+
+  factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+        user: json["user"],
+        name: json["name"],
+        dateAdded: DateTime.parse(json["date_added"]),
+        amount: json["amount"],
+        price: json["price"],
+        description: json["description"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "user": user,
+        "name": name,
+        "date_added":
+            "${dateAdded.year.toString().padLeft(4, '0')}-${dateAdded.month.toString().padLeft(2, '0')}-${dateAdded.day.toString().padLeft(2, '0')}",
+        "amount": amount,
+        "price": price,
+        "description": description,
+      };
+}
+```
+3. Menampilkan data tersebut di dalam widget sesuai dengan keinginan, seperti berikut:
+```dart
+class _ProductPageState extends State<ProductPage> {
+  Future<List<Item>> fetchProduct() async {
+    var url = Uri.parse('http://clement-samuel-tugas.pbp.cs.ui.ac.id/');
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    // melakukan decode response menjadi bentuk json
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+
+    // melakukan konversi data json menjadi object Product
+    List<Item> list_product = [];
+    for (var d in data) {
+      if (d != null) {
+        list_product.add(Item.fromJson(d));
+      }
+    }
+    return list_product;
+  }
+}
+```
+```dart
+children: [
+  Text(
+    "${snapshot.data![index].fields.name}",
+    style: const TextStyle(
+      fontSize: 18.0,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  const SizedBox(height: 10),
+  Text(
+      "Amount         |    ${snapshot.data![index].fields.amount}"),
+  const SizedBox(height: 10),
+  Text(
+      "Price              |    ${snapshot.data![index].fields.price}"),
+  const SizedBox(height: 10),
+  Text(
+      "Description   |    ${snapshot.data![index].fields.description}")
+],
+```
+
 ## Membuat halaman yang berisi daftar semua item
+1. Buat *file* baru pada *folder* `lib/screens` dengan nama `list_item.dart`. Lalu, tambahkan *import* yang sesuai.
+```dart
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:gameshop/models/item.dart';
+import 'package:gameshop/widgets/left_drawer.dart';
+import 'package:gameshop/screens/item_detail.dart';
+```
+2. Tambahkan kode berikut untuk menampilkan data - data yang sesuai dengan parameter tambahan `id` untuk melakukan `filter` sesuai dengan *item* yang ditambahkan oleh tiap pengguna.
+```dart
+class ProductPage extends StatefulWidget {
+  final int id;
+  const ProductPage({Key? key, required this.id}) : super(key: key);
+
+  @override
+  _ProductPageState createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  Future<List<Item>> fetchProduct() async {
+    final int id = widget.id;
+    var url = Uri.parse('http://localhost:8000/json/');
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    // melakukan decode response menjadi bentuk json
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+
+    // melakukan konversi data json menjadi object Product
+    List<Item> list_product = [];
+    for (var d in data) {
+      if (d != null && d['fields']['user'] == id) {
+        list_product.add(Item.fromJson(d));
+      }
+    }
+    return list_product;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final int id = widget.id;
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Product'),
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+        ),
+        drawer: LeftDrawer(id: id),
+        body: FutureBuilder(
+            future: fetchProduct(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                if (!snapshot.hasData) {
+                  return const Column(
+                    children: [
+                      Text(
+                        "Tidak ada data produk.",
+                        style:
+                            TextStyle(color: Color(0xff59A5D8), fontSize: 20),
+                      ),
+                      SizedBox(height: 8),
+                    ],
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (_, index) => GestureDetector(
+                      onTap: () {
+                        // Navigasi ke halaman detail saat item ditekan
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ItemDetail(item: snapshot.data![index]),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        // Widget item yang dapat ditekan
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${snapshot.data![index].fields.name}",
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                                "Amount         |    ${snapshot.data![index].fields.amount}"),
+                            const SizedBox(height: 10),
+                            Text(
+                                "Price              |    ${snapshot.data![index].fields.price}"),
+                            const SizedBox(height: 10),
+                            Text(
+                                "Description   |    ${snapshot.data![index].fields.description}")
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }
+            }));
+  }
+}
+```
+3. Tambahkan halaman `list_item.dart` ke dalam `left_drawer.dart` menggunakan *widget* `Navigator`.
+4. Ubah fungsi *button* `Item List` pada halaman utama dan sesuaikan *import* dari setiap *file*.
+
 ## Membuat halaman detail untuk tiap item
+1. Membuat *file* baru dengan nama `item_detail.dart` dan *import* *file* tersebut ke dalam `list_item.dart`.
+2. Isi file dengan kode berikut untuk menunjukkan *detail* item secara spesifik.
+```dart
+import 'package:flutter/material.dart';
+import 'package:gameshop/models/item.dart'; // Import model Item untuk digunakan di halaman detail
+
+class ItemDetail extends StatelessWidget {
+  final Item item; // Terima objek Item dari halaman sebelumnya
+
+  const ItemDetail({Key? key, required this.item}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(item.fields.name),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Amount: ${item.fields.amount}',
+              style: TextStyle(fontSize: 18.0),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Price: ${item.fields.price}',
+              style: TextStyle(fontSize: 18.0),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Description: ${item.fields.description}',
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+3. Menggunakan `GestureDetector` untuk mengetahui adanya interaksi dari *user* dan menambahkan *route* ke `ItemDetail` dari *file* `item_detail.dart` untuk menampilkan *detail* *item* secara spesifik.
+```dart
+itemBuilder: (_, index) => GestureDetector(
+  onTap: () {
+    // Navigasi ke halaman detail saat item ditekan
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ItemDetail(item: snapshot.data![index]),
+      ),
+    );
+  },
+  child: Container(
+    // Widget item yang dapat ditekan
+    margin: const EdgeInsets.symmetric(
+        horizontal: 16, vertical: 12),
+    padding: const EdgeInsets.all(20.0),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${snapshot.data![index].fields.name}",
+          style: const TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+            "Amount         |    ${snapshot.data![index].fields.amount}"),
+        const SizedBox(height: 10),
+        Text(
+            "Price              |    ${snapshot.data![index].fields.price}"),
+        const SizedBox(height: 10),
+        Text(
+            "Description   |    ${snapshot.data![index].fields.description}")
+      ],
+    ),
+  ),
+),
+```
+
+# Terima kasih

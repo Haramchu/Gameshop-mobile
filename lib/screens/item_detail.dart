@@ -10,7 +10,9 @@ class ItemDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(item.fields.name), // Gunakan nama item sebagai judul AppBar
+        title: Text(item.fields.name),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -31,7 +33,6 @@ class ItemDetail extends StatelessWidget {
               'Description: ${item.fields.description}',
               style: TextStyle(fontSize: 18.0),
             ),
-            // Tambahkan informasi lainnya sesuai kebutuhan
           ],
         ),
       ),
