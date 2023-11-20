@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gameshop/screens/menu.dart';
 import 'package:gameshop/screens/gameshop_form.dart';
-import 'package:gameshop/item_page.dart';
+import 'package:gameshop/screens/list_item.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -18,7 +18,7 @@ class LeftDrawer extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Game Shop',
+                  'GameShop',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30,
@@ -28,7 +28,7 @@ class LeftDrawer extends StatelessWidget {
                 ),
                 Padding(padding: EdgeInsets.all(10)),
                 Text(
-                  "Catat seluruh keperluan belanjamu di sini!",
+                  "All Item!",
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white,
@@ -41,37 +41,36 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.home_outlined),
-            title: const Text('Halaman Utama'),
+            title: const Text('Main Page'),
+            // Bagian redirection ke MyHomePage
             onTap: () {
               Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
-                ),
-              );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(),
+                  ));
             },
           ),
           ListTile(
             leading: const Icon(Icons.add_shopping_cart),
-            title: const Text('Lihat Item'),
+            title: const Text('Add Item'),
+            // Bagian redirection ke ShopFormPage
             onTap: () {
               Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ItemPage(),
-                ),
-              );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ShopFormPage(),
+                  ));
             },
           ),
           ListTile(
-            leading: const Icon(Icons.add_shopping_cart),
-            title: const Text('Tambah Item'),
+            leading: const Icon(Icons.shopping_basket),
+            title: const Text('Item List'),
             onTap: () {
-              Navigator.pushReplacement(
+              // Route menu ke halaman produk
+              Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ShopFormPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ProductPage()),
               );
             },
           ),
