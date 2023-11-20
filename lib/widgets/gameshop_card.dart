@@ -15,8 +15,8 @@ class ShopItem {
 
 class ShopCard extends StatelessWidget {
   final ShopItem item;
-
-  const ShopCard(this.item, {super.key}); // Constructor
+  final int id;
+  const ShopCard(this.item, this.id, {super.key}); // Constructor
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +33,10 @@ class ShopCard extends StatelessWidget {
                 content: Text("Kamu telah menekan tombol ${item.name}!")));
           if (item.name == "Add Item") {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ShopFormPage()));
+                MaterialPageRoute(builder: (context) => ShopFormPage(id: id)));
           } else if (item.name == "Item List") {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ProductPage()));
+                MaterialPageRoute(builder: (context) => ProductPage(id: id)));
           } else if (item.name == "Logout") {
             final response =
                 await request.logout("http://localhost:8000/auth/logout/");

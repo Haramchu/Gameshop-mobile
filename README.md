@@ -4,9 +4,15 @@ NPM         : 2206082114
 
 Kelas       : PBP C
 
+[Web App](clement-samuel-tugas.pbp.cs.ui.ac.id)
+
+Flutter App (TBA)
+
 [Tugas 7](#tugas-7)
 
 [Tugas 8](#tugas-8)
+
+[Tugas 9](#tugas-9)
 
 # Tugas 7
 ## Membuat sebuah program Flutter baru
@@ -205,7 +211,7 @@ Source:[geeksforgeeks](https://www.geeksforgeeks.org/flutter-stateful-vs-statele
 
 Widget lain yang digunakan, seperti *Scaffold, AppBar, SingleChildScrollView, Padding, Column, GridView.count, InkWell, Container, Center, Icon, Text, dan SnackBar*, adalah bagian dari Flutter SDK dan digunakan untuk mengatur tata letak dan menampilkan elemen UI yang berbeda di aplikasi.
 
-# Tugas 7
+# Tugas 8
 ## Perbedaan `Navigator.push()` dan `Navigator.pushReplacement()`
 ### `Navigator.push()`
 `Navigator.push()` menambahkan *suatu route* ke dalam *stack route* yang dikelola oleh `Navigator`. Method ini menyebabkan *route* yang ditambahkan berada pada paling atas *stack*, sehingga *route* yang baru saja ditambahkan tersebut akan muncul dan ditampilkan kepada pengguna.
@@ -468,8 +474,10 @@ ElevatedButton(
   ),
 ),
 ```
+
 ## *Clean architecture*
 *Clean Architecture* adalah suatu arsitektur perangkat lunak yang menekankan pemisahan konsep dan tanggung jawab di dalam aplikasi. *Clean Architecture* membagi kode ke dalam beberapa lapisan (*layers*) untuk memastikan bahwa kode bersih, terorganisir, dan dapat diuji dengan baik.
+
 **Penerapan *Clean architecture* pada aplikasi Flutter:**
 *Clean Architecture* adalah pendekatan desain perangkat lunak yang menekankan pemisahan konsep dan tanggung jawab dalam sebuah aplikasi. Pada *Clean Architecture*, ada prinsip yang dikenal sebagai "*Dependency Rule*" yang menyatakan bahwa ketergantungan arah harus mengarah ke dalam. Ini berarti modul internal tidak tahu atau tidak bergantung pada modul eksternal, sementara modul eksternal tahu dan bergantung pada modul internal.
 
@@ -534,6 +542,7 @@ Scaffold(
 ```dart
 class _ShopFormPageState extends State<ShopFormPage> {
   final _formKey = GlobalKey<FormState>();
+}
 ```
 ```dart
 ...
@@ -550,36 +559,39 @@ class _ShopFormPageState extends State<ShopFormPage> {
   String _name = "";
   int _price = 0;
   String _description = "";
+}
 ```
 5. Membuat widget `TextFormField` yang dibungkus oleh `Padding` sebagai salah satu *children* dari widget `Column`. Setelah itu, tambahkan atribut `crossAxisAlignment` untuk mengatur *alignment* *children* dari `Column`.
 ```dart
 ...
 child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            decoration: InputDecoration(
-              hintText: "Nama Produk",
-              labelText: "Nama Produk",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-            ),
-            onChanged: (String? value) {
-              setState(() {
-                _name = value!;
-              });
-            },
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return "Nama tidak boleh kosong!";
-              }
-              return null;
-            },
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        decoration: InputDecoration(
+          hintText: "Nama Produk",
+          labelText: "Nama Produk",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5.0),
           ),
         ),
+        onChanged: (String? value) {
+          setState(() {
+            _name = value!;
+          });
+        },
+        validator: (String? value) {
+          if (value == null || value.isEmpty) {
+            return "Nama tidak boleh kosong!";
+          }
+          return null;
+        },
+      ),
+    ),
+  ]
+)
 ...
 ```
 6. Membuat dua `TextFormField` yang dibungkus dengan `Padding` sebagai child selanjutnya dari `Column` seperti sebelumnya untuk *field* `price` dan `description`.
@@ -840,3 +852,194 @@ const DrawerHeader(
 ```dart
 drawer: const LeftDrawer(),
 ```
+
+# Tugas 9
+## Pengambilan data JSON tanpa membuat model terlebih dahulu
+Pengambilan data JSON tanpa membuat model terlebih dahulu bisa dilakukan. Data JSON di-*deserialization* langsung, dimana data JSON dikonversi langsung menjadi objek tanpa model yang ditentukan. Kelemahan dari *deserialization* ini adalah data biasanya kurang terstruktur. Membuat model lebih baik karena memungkinkan struktur data yang jelas dan mempermudah dalam mengelola data.
+
+## Fungsi dari CookieRequest
+Merupakan objek yang berkaitan dengan permintaan HTTP yang menyimpan informasi *cookie*. Digunakan dalam Flutter untuk menyimpan atau mengelola *cookie* yang diperlukan untuk otorisasi atau autentikasi.
+*Instance* `CookieRequest` dibagikan ke semua komponen di aplikasi Flutter agar dapat digunakan secara konsisten di seluruh aplikasi, memastikan bahwa *cookie* yang benar dan diperlukan dapat diakses atau diproses dengan benar.
+
+## Mekanisme pengambilan data dari JSON dan penampilan data di flutter
+1. Melakukan permintaan HTTP ke endpoint yang menyediakan data dalam format JSON. Hal ini dapat dilakukan dengan menggunakan file baru di /lib/models/<NAMA-MODEL>.dart dan isi sesuai dengan format json yang akan diterima melalui konversi di [Quicktype](https://app.quicktype.io)
+2. Melakukan parsing (deserialization) respons JSON ke dalam struktur data yang dapat digunakan dalam aplikasi Flutter, seperti kode berikut yang didapatkan dari hasil konversi di Quicktype:
+```dart
+class Item {
+  String model;
+  int pk;
+  Fields fields;
+
+  Item({
+    required this.model,
+    required this.pk,
+    required this.fields,
+  });
+
+  factory Item.fromJson(Map<String, dynamic> json) => Item(
+        model: json["model"],
+        pk: json["pk"],
+        fields: Fields.fromJson(json["fields"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "model": model,
+        "pk": pk,
+        "fields": fields.toJson(),
+      };
+}
+
+class Fields {
+  int user;
+  String name;
+  DateTime dateAdded;
+  int amount;
+  int price;
+  String description;
+
+  Fields({
+    required this.user,
+    required this.name,
+    required this.dateAdded,
+    required this.amount,
+    required this.price,
+    required this.description,
+  });
+
+  factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+        user: json["user"],
+        name: json["name"],
+        dateAdded: DateTime.parse(json["date_added"]),
+        amount: json["amount"],
+        price: json["price"],
+        description: json["description"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "user": user,
+        "name": name,
+        "date_added":
+            "${dateAdded.year.toString().padLeft(4, '0')}-${dateAdded.month.toString().padLeft(2, '0')}-${dateAdded.day.toString().padLeft(2, '0')}",
+        "amount": amount,
+        "price": price,
+        "description": description,
+      };
+}
+```
+4. Menampilkan data tersebut di dalam widget sesuai dengan keinginan, seperti berikut:
+```dart
+class _ProductPageState extends State<ProductPage> {
+  Future<List<Item>> fetchProduct() async {
+    var url = Uri.parse('http://clement-samuel-tugas.pbp.cs.ui.ac.id/');
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    // melakukan decode response menjadi bentuk json
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+
+    // melakukan konversi data json menjadi object Product
+    List<Item> list_product = [];
+    for (var d in data) {
+      if (d != null) {
+        list_product.add(Item.fromJson(d));
+      }
+    }
+    return list_product;
+  }
+}
+```
+```dart
+children: [
+  Text(
+    "${snapshot.data![index].fields.name}",
+    style: const TextStyle(
+      fontSize: 18.0,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  const SizedBox(height: 10),
+  Text(
+      "Amount         |    ${snapshot.data![index].fields.amount}"),
+  const SizedBox(height: 10),
+  Text(
+      "Price              |    ${snapshot.data![index].fields.price}"),
+  const SizedBox(height: 10),
+  Text(
+      "Description   |    ${snapshot.data![index].fields.description}")
+],
+```
+
+## Mekanisme autentikasi akun pada Flutter ke Django
+1. Menggunakan `provider` dan `pbp_django_auth` untuk integrasi autentikasi dari Django.
+2. Mengirim data autentikasi berupa *username* dan *password* ke backend Django melalui permintaan HTTP, seperti pada kode berikut:
+```dart
+  String username = _usernameController.text;
+  String password = _passwordController.text;
+
+  final response = await request.login("http://clement-samuel-tugas.pbp.cs.ui.ac.id/auth/login/", {
+  'username': username,
+  'password': password,
+  }
+  )
+```
+3. Django akan mengecek data autentikasi yang dikirim dan jika *valid*, maka widget `Navigator` digunakan untuk *redirect* aplikasi Flutter ke `menu.dart`:
+```dart
+if (request.loggedIn) {
+  String message = response['message'];
+  String uname = response['username'];
+  Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyHomePage()),
+  )
+}
+```
+
+## *Used Widget*
+1. **Scaffold**: 
+Mengatur dasar aplikasi dengan `AppBar`, `Drawer`, dan `body`.
+2. **Form**: 
+Mengatur form untuk input data *item*.
+3. **TextFormField**: 
+Widget input teks untuk mengumpulkan data, seperti nama *item*, jumlah, harga, dan deskripsi.
+4. **ElevatedButton**: 
+Tombol *elevated* yang digunakan untuk menyimpan data *item* yang dimasukkan.
+5. **SnackBar**: 
+Menampilkan notifikasi setelah berhasil menyimpan *item* atau jika terdapat kesalahan.
+6. **FutureBuilder**: 
+Mengelola tampilan berdasarkan status future untuk mendapatkan dan menampilkan data *item* secara asinkronus.
+7. **ListView.builder**: 
+Menampilkan daftar *item* dalam bentuk list yang dapat di-*scroll*.
+8. **MaterialApp**: 
+Widget *root* yang menentukan tema dan halaman awal aplikasi.
+9. **Provider**: 
+Digunakan untuk menyediakan *instance* CookieRequest ke seluruh aplikasi menggunakan `Provider`.
+10. **Column**: 
+Menyusun widget secara vertikal.
+11. **GridView.count**: 
+Menampilkan daftar *item* dalam grid layout.
+12. **ShopCard**: 
+Widget custom untuk menampilkan setiap *item* dalam bentuk card.
+13. **Material**: 
+Mengatur warna background *item* di dalam grid.
+14. **InkWell**: 
+Widget responsif terhadap sentuhan pengguna.
+15. **Icon**: 
+Menampilkan ikon *item*.
+16. **Text**: 
+Menampilkan nama *item*.
+18. **ListView**: 
+Menampilkan daftar opsi menu dalam *drawer*.
+19. **ListTile**: 
+Membuat opsi menu dalam *drawer*.
+20. **Navigator**: 
+Bertanggung jawab untuk menavigasi antar halaman dalam aplikasi.
+
+dan lainnya.
+
+## Membuat halaman login pada aplikasi Flutter
+## Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter
+## Membuat model kustom sesuai dengan proyek Django
+## Membuat halaman yang berisi daftar semua item
+## Membuat halaman detail untuk tiap item

@@ -3,7 +3,8 @@ import 'package:gameshop/widgets/left_drawer.dart';
 import 'package:gameshop/widgets/gameshop_card.dart';
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  final int id;
+  MyHomePage({Key? key, required this.id}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -30,7 +31,7 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      drawer: const LeftDrawer(),
+      drawer: LeftDrawer(id: id),
       body: SingleChildScrollView(
         // Widget wrapper yang dapat discroll
         child: Padding(
@@ -61,7 +62,7 @@ class MyHomePage extends StatelessWidget {
                 shrinkWrap: true,
                 children: items.map((ShopItem item) {
                   // Iterasi untuk setiap item
-                  return ShopCard(item);
+                  return ShopCard(item, id);
                 }).toList(),
               ),
             ],

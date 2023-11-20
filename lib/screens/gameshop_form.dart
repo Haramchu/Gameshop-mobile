@@ -7,7 +7,8 @@ import 'package:gameshop/screens/menu.dart';
 import 'package:gameshop/widgets/left_drawer.dart';
 
 class ShopFormPage extends StatefulWidget {
-  const ShopFormPage({super.key});
+  final int id;
+  const ShopFormPage({super.key, required this.id});
 
   @override
   State<ShopFormPage> createState() => _ShopFormPageState();
@@ -21,6 +22,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
   String _description = "";
   @override
   Widget build(BuildContext context) {
+    final int id = widget.id;
     final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +34,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      drawer: const LeftDrawer(),
+      drawer: LeftDrawer(id: id),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -160,7 +162,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MyHomePage()),
+                                builder: (context) => MyHomePage(id: id)),
                           );
                         } else {
                           ScaffoldMessenger.of(context)

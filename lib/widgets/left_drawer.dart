@@ -4,7 +4,8 @@ import 'package:gameshop/screens/gameshop_form.dart';
 import 'package:gameshop/screens/list_item.dart';
 
 class LeftDrawer extends StatelessWidget {
-  const LeftDrawer({super.key});
+  final int id;
+  const LeftDrawer({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => MyHomePage(id: id),
                   ));
             },
           ),
@@ -59,7 +60,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ShopFormPage(),
+                    builder: (context) => ShopFormPage(id: id),
                   ));
             },
           ),
@@ -70,7 +71,7 @@ class LeftDrawer extends StatelessWidget {
               // Route menu ke halaman produk
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProductPage()),
+                MaterialPageRoute(builder: (context) => ProductPage(id: id)),
               );
             },
           ),

@@ -3,9 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:gameshop/models/item.dart';
 import 'package:gameshop/widgets/left_drawer.dart';
+import 'package:gameshop/screens/item_detail.dart';
 
 class ProductPage extends StatefulWidget {
-  const ProductPage({Key? key}) : super(key: key);
+  final int id;
+  const ProductPage({Key? key, required this.id}) : super(key: key);
 
   @override
   _ProductPageState createState() => _ProductPageState();
@@ -13,6 +15,7 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   Future<List<Item>> fetchProduct() async {
+    final int id = widget.id;
     var url = Uri.parse('http://localhost:8000/json/');
     var response = await http.get(
       url,
@@ -25,7 +28,7 @@ class _ProductPageState extends State<ProductPage> {
     // melakukan konversi data json menjadi object Product
     List<Item> list_product = [];
     for (var d in data) {
-      if (d != null) {
+      if (d != null && d['fields']['user'] == id) {
         list_product.add(Item.fromJson(d));
       }
     }
@@ -34,11 +37,12 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final int id = widget.id;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Product'),
         ),
-        drawer: const LeftDrawer(),
+        drawer: LeftDrawer(id: id),
         body: FutureBuilder(
             future: fetchProduct(),
             builder: (context, AsyncSnapshot snapshot) {
@@ -58,34 +62,48 @@ class _ProductPageState extends State<ProductPage> {
                   );
                 } else {
                   return ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (_, index) => Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "${snapshot.data![index].fields.name}",
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                    "Amount         |    ${snapshot.data![index].fields.amount}"),
-                                const SizedBox(height: 10),
-                                Text(
-                                    "Price              |    ${snapshot.data![index].fields.price}"),
-                                const SizedBox(height: 10),
-                                Text(
-                                    "Description   |    ${snapshot.data![index].fields.description}")
-                              ],
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (_, index) => GestureDetector(
+                      onTap: () {
+                        // Navigasi ke halaman detail saat item ditekan
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ItemDetail(item: snapshot.data![index]),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        // Widget item yang dapat ditekan
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${snapshot.data![index].fields.name}",
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ));
+                            const SizedBox(height: 10),
+                            Text(
+                                "Amount         |    ${snapshot.data![index].fields.amount}"),
+                            const SizedBox(height: 10),
+                            Text(
+                                "Price              |    ${snapshot.data![index].fields.price}"),
+                            const SizedBox(height: 10),
+                            Text(
+                                "Description   |    ${snapshot.data![index].fields.description}")
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
                 }
               }
             }));
