@@ -5,18 +5,18 @@ import 'package:gameshop/screens/list_item.dart';
 import 'package:gameshop/screens/login.dart';
 import 'package:gameshop/screens/gameshop_form.dart';
 
-class ShopItem {
+class BookItem {
   final String name;
   final IconData icon;
   final Color color;
 
-  ShopItem(this.name, this.icon, this.color);
+  BookItem(this.name, this.icon, this.color);
 }
 
-class ShopCard extends StatelessWidget {
-  final ShopItem item;
+class BookCard extends StatelessWidget {
+  final BookItem item;
   final int id;
-  const ShopCard(this.item, this.id, {super.key}); // Constructor
+  const BookCard(this.item, this.id, {super.key}); // Constructor
 
   @override
   Widget build(BuildContext context) {

@@ -15,10 +15,10 @@ class MyHomePage extends StatelessWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".;
 
-  final List<ShopItem> items = [
-    ShopItem("Item List", Icons.checklist, Colors.blue),
-    ShopItem("Add Item", Icons.add_shopping_cart, Colors.green),
-    ShopItem("Logout", Icons.logout, Colors.red),
+  final List<BookItem> items = [
+    BookItem("Item List", Icons.checklist, Colors.blue),
+    BookItem("Add Item", Icons.add_shopping_cart, Colors.green),
+    BookItem("Logout", Icons.logout, Colors.red),
   ];
 
   @override
@@ -60,9 +60,9 @@ class MyHomePage extends StatelessWidget {
                 mainAxisSpacing: 10,
                 crossAxisCount: 3,
                 shrinkWrap: true,
-                children: items.map((ShopItem item) {
+                children: items.map((BookItem item) {
                   // Iterasi untuk setiap item
-                  return ShopCard(item, id);
+                  return BookCard(item, id);
                 }).toList(),
               ),
             ],
